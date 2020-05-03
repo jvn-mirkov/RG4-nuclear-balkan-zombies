@@ -12,4 +12,7 @@ Box::Box(int x, int y){
 
 void Box::destroyBox(){
 
+
+
+
 }

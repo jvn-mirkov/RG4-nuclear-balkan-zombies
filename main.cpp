@@ -14,11 +14,12 @@
 #include "Map.h"
 #include "Box.h"
 #include "ControlMatrix.h"
-#include "Bomb.h"
+
 
 //definovi:
 #define TIMER_ID_P1 (0)
 #define TIMER_ID_P2 (6)
+#define TIMER_ID_B1 (11)
 #define TIMER_INTERVAL (10)
 #define DEFAULT (5)
 #define UP (1)
@@ -31,6 +32,13 @@
 float p1updown, p1leftright = 0;
 float p2updown, p2leftright = 0;
 int arrow = DEFAULT;
+
+
+//clipping planes
+double clip_plane0[] = {1,0,0,0};
+double clip_plane1[] = {0,0,1,0};
+double clip_plane2[] = {-1,0,0,15};
+double clip_plane3[] = {0,0,-1,13.001};
 
 
 // function declarations
@@ -47,6 +55,7 @@ static void ontimer(int value);
 Player *player1 = new Player(1.5, 1.5);
 Map *map = new Map();
 std::map<std::string, Box *> boxes;
+ControlMatrix *cm = new ControlMatrix();
 
 void showBoxesMap() {
 
@@ -59,7 +68,7 @@ void showBoxesMap() {
 
 void initBoxes() {
 
-    ControlMatrix *cm = new ControlMatrix();
+
 
     //cm->showMatrix();
 
@@ -154,6 +163,18 @@ static void on_keyboard(unsigned char key, int x, int y) {
 
             break;
 
+        case 'q':
+        case 'Q':
+            glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_B1);
+
+            break;
+
+
+
+
+
+
+
         case 'i':
         case 'I':
             arrow = UP;
@@ -220,6 +241,11 @@ static void ontimer(int value) {
 
     }
 
+    if(value == TIMER_ID_B1){
+
+        player1->dropBomb(cm);
+        std::cout<<"player1 - drop bomb" <<std::endl;
+    }
 
     glutPostRedisplay();
 
@@ -241,9 +267,29 @@ static void on_display(void) {
     );
 
 
+    glClipPlane(GL_CLIP_PLANE0,clip_plane0);
+    glClipPlane(GL_CLIP_PLANE1,clip_plane1);
+    glClipPlane(GL_CLIP_PLANE2,clip_plane2);
+    glClipPlane(GL_CLIP_PLANE3,clip_plane3);
+
+
+    glEnable(GL_CLIP_PLANE0);
+    glEnable(GL_CLIP_PLANE1);
+    glEnable(GL_CLIP_PLANE2);
+    glEnable(GL_CLIP_PLANE3);
+
+
     map->renderMap();
-    map->renderBoxes();
+    map->renderBoxes(cm);
     player1->renderPlayer();
+    map->renderBombs(cm);
+
+    glDisable(GL_CLIP_PLANE3);
+    glDisable(GL_CLIP_PLANE2);
+    glDisable(GL_CLIP_PLANE1);
+    glDisable(GL_CLIP_PLANE0);
+
+
 
 
 /*

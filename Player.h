@@ -5,6 +5,7 @@
 #include<GL/glut.h>
 #include<iostream>
 #include<vector>
+#include "ControlMatrix.h"
 
 class Player {
 public:
@@ -20,6 +21,10 @@ public:
 
     void moveVertical(float step);
     void moveHorizontal(float step);
+    void dropBomb(ControlMatrix *cm);
+    void explosionAnimation(int bombX, int bombY);
+    void destroyBomb(ControlMatrix *cm, int bombX, int bombY);
+
 
 private:
     float x;

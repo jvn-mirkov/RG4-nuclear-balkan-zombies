@@ -99,9 +99,9 @@ void Map::renderMap() {
 
 }
 
-void Map::renderBoxes() {
+void Map::renderBoxes(ControlMatrix *cm) {
 
-    ControlMatrix *cm = new ControlMatrix();
+    //ControlMatrix *cm = new ControlMatrix();
 
     //cm->showMatrix();
 
@@ -128,4 +128,30 @@ void Map::renderBoxes() {
 
 }
 
-void Map::renderBombs() {}
+void Map::renderBombs(ControlMatrix *cm) {
+
+    for (int i = 15 - 1; i >= 0; i--) {
+        for (int j = 13 - 1; j >= 0; j--) {
+            if (cm->mx[j][i] == 'Q') {
+
+                glPushMatrix();
+
+                glColor3f(0.7, 0.1, 0.7);
+
+
+                glTranslatef(i + 0.5, 1 - 0.5, j + 0.5);
+
+                glRotatef(45,0.0,0.0,1.0);
+                glScalef(0.45, 0.45, 0.45);
+                glutSolidCube(1);
+
+                glPopMatrix();
+
+
+            }
+        }
+
+    }
+
+
+}
