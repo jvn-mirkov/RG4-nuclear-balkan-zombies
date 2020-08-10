@@ -9,7 +9,7 @@
 
 class Player {
 public:
-    Player(float xStart, float yStart);
+    Player(float xStart, float yStart, char playerNum);
 
     void setX(float x);
 
@@ -19,19 +19,22 @@ public:
 
     float getStep() const;
 
-    void moveVertical(float step);
-    void moveHorizontal(float step);
+    void moveVertical(ControlMatrix *cm, float step);
+    void moveHorizontal(ControlMatrix *cm, float step);
     void dropBomb(ControlMatrix *cm);
+
+
     void explosionAnimation(int bombX, int bombY);
     void destroyBomb(ControlMatrix *cm, int bombX, int bombY);
 
 
 private:
+    char playerNum;
     float x;
     float y;
-    float step = 0.5;
-    float dHorizontal = 0;
-    float dVertical = 0;
+    float step = 0.1;
+    //float dHorizontal = 0;
+    //float dVertical = 0;
     float xStart;
     float yStart;
 

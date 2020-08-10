@@ -52,7 +52,7 @@ static void ontimer(int value);
 
 
 // global objects
-Player *player1 = new Player(1.5, 1.5);
+Player *player1 = new Player(1.5, 1.5, '1');
 Map *map = new Map();
 std::map<std::string, Box *> boxes;
 ControlMatrix *cm = new ControlMatrix();
@@ -134,6 +134,12 @@ static void on_keyboard(unsigned char key, int x, int y) {
             break;
 
 
+
+        case 'm':
+        case 'M':
+            cm->showMatrix();
+
+
         case 's':
         case 'S':
         case GLUT_KEY_UP:
@@ -208,16 +214,16 @@ static void ontimer(int value) {
     if (value == TIMER_ID_P1) {
 
         if (arrow == RIGHT) {
-            player1->moveVertical(player1->getStep());
+            player1->moveVertical(cm, player1->getStep());
 
         } else if (arrow == UP) {
-            player1->moveHorizontal(-player1->getStep());
+            player1->moveHorizontal(cm, -player1->getStep());
 
         } else if (arrow == LEFT) {
-            player1->moveVertical(-player1->getStep());
+            player1->moveVertical(cm, -player1->getStep());
 
         } else if (arrow == DOWN) {
-            player1->moveHorizontal(player1->getStep());
+            player1->moveHorizontal(cm, player1->getStep());
 
         }
 
@@ -261,10 +267,12 @@ static void on_display(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(
-            5, 15, 20,
+            5, 15, 15,
             5, 0, 5,
-            0, 11, 0
+            0, 15, 0
     );
+
+
 
 
     glClipPlane(GL_CLIP_PLANE0,clip_plane0);
@@ -272,11 +280,11 @@ static void on_display(void) {
     glClipPlane(GL_CLIP_PLANE2,clip_plane2);
     glClipPlane(GL_CLIP_PLANE3,clip_plane3);
 
-
     glEnable(GL_CLIP_PLANE0);
     glEnable(GL_CLIP_PLANE1);
     glEnable(GL_CLIP_PLANE2);
     glEnable(GL_CLIP_PLANE3);
+
 
 
     map->renderMap();

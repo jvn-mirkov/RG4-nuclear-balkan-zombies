@@ -10,6 +10,9 @@ Box::Box(int x, int y){
     this->y = y;
 }
 
+
+
+
 void Box::destroyBox(){
 
 

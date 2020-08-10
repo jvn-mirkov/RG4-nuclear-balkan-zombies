@@ -8,19 +8,9 @@ ControlMatrix::ControlMatrix() {
 
 std::string ControlMatrix::checkField(float x, float y) {
 
-    //TEST:?????????????????
+    //TODO: cesta ponavljanja trunc nad koordinatama se mogu izdvojiti ovde u buducnosti
 
-
-
-
-    int a = static_cast<int>(floor(x));
-    int b = static_cast<int>(floor(y));
-
-    std::string s;
-    s += std::to_string(a);
-    s += std::to_string(b);
-
-    return s;
+    return nullptr;
 }
 
 
