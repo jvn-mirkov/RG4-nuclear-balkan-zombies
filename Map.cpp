@@ -6,14 +6,15 @@
 
 Map::Map() {}
 
+//postavka poda, zidova i stubova
 void Map::renderMap() {
 
 
+    //pod
     glPushMatrix();
 
     glColor3f(0.556863, 0.137255, 0.137255);
-    glTranslatef(7.5, -0.5, 6.5); /*pod*/
-
+    glTranslatef(7.5, -0.5, 6.5);
 
 
     glScalef(15, 1, 13);
@@ -21,12 +22,14 @@ void Map::renderMap() {
 
     glPopMatrix();
 
+
+
+    //zidovi
+
     glPushMatrix();
 
     glColor3f(0.36, 0.25, 0.26);
-    glTranslatef(7.5, 0.50, 0.5); /*zid1*/
-
-
+    glTranslatef(7.5, 0.50, 0.5);
 
 
     glScalef(15, 1, 1);
@@ -37,8 +40,7 @@ void Map::renderMap() {
     glPushMatrix();
 
     glColor3f(0.36, 0.25, 0.26);
-    glTranslatef(7.5, 1 - 0.50, 0.5 + 12); /*zid2*/
-
+    glTranslatef(7.5, 1 - 0.50, 0.5 + 12);
 
 
     glScalef(15, 1, 1);
@@ -50,10 +52,7 @@ void Map::renderMap() {
     glPushMatrix();
 
     glColor3f(0.36, 0.25, 0.26);
-    glTranslatef(0 + 0.5, 1 - 0.5, 6.5); /*zid3*/
-
-
-
+    glTranslatef(0 + 0.5, 1 - 0.5, 6.5);
 
 
     glScalef(1, 1, 13);
@@ -65,10 +64,7 @@ void Map::renderMap() {
     glPushMatrix();
 
     glColor3f(0.36, 0.25, 0.26);
-    glTranslatef(14 + 0.5, 1 - 0.5, 6.5); /*zid4*/
-
-
-
+    glTranslatef(14 + 0.5, 1 - 0.5, 6.5);
 
 
     glScalef(1, 1, 13);
@@ -77,7 +73,7 @@ void Map::renderMap() {
     glPopMatrix();
 
 
-/*STUBOVI*/
+    //stubovi
     int i, j;
     for (j = 0; j < 11; j = j + 2) {
         for (i = 0; i < 13; i = i + 2) {
@@ -99,6 +95,7 @@ void Map::renderMap() {
 
 }
 
+//cita kontrolnu matricu i prema njoj iscrtava kutije
 void Map::renderBoxes(ControlMatrix *cm) {
 
     //ControlMatrix *cm = new ControlMatrix();
@@ -128,6 +125,7 @@ void Map::renderBoxes(ControlMatrix *cm) {
 
 }
 
+//cita kontrolnu matricu i prema njoj iscrtava bombe
 void Map::renderBombs(ControlMatrix *cm) {
 
     for (int i = 15 - 1; i >= 0; i--) {
@@ -141,7 +139,7 @@ void Map::renderBombs(ControlMatrix *cm) {
 
                 glTranslatef(i + 0.5, 1 - 0.5, j + 0.5);
 
-                glRotatef(45,0.0,0.0,1.0);
+                glRotatef(45, 0.0, 0.0, 1.0);
                 glScalef(0.45, 0.45, 0.45);
                 glutSolidCube(1);
 
@@ -155,3 +153,114 @@ void Map::renderBombs(ControlMatrix *cm) {
 
 
 }
+
+//iscrtavanje eksplozije za po jedno polje horizontalno i vertikalno u oba smera u odnosu na prosledjene kordinate
+void Map::renderBombAnimationPart1(float x, float y) {
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(1 + y, 0 + 2, 0 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(-1 + y, 0 + 2, 0 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(0 + y, 0 + 2, 1 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(0 + y, 0 + 2, -1 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+}
+
+//iscrtavanje eksplozije za po dva polja horizontalno i vertikalno u oba smera u odnosu na prosledjene kordinate
+void Map::renderBombAnimationPart2(float x, float y) {
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(2 + y, 0 + 2, 0 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(-2 + y, 0 + 2, 0 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(0 + y, 0 + 2, 2 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+
+    glColor3f(1, 0, 0);
+    glTranslatef(0 + y, 0 + 2, -2 + x);
+    //glRotatef(45, 0.0, 0.0, 1.0);
+    glScalef(0.45, 2, 0.45);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

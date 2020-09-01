@@ -2,9 +2,8 @@
 
 
 ControlMatrix::ControlMatrix() {
-
-
 }
+
 
 std::string ControlMatrix::checkField(float x, float y) {
 
@@ -13,7 +12,7 @@ std::string ControlMatrix::checkField(float x, float y) {
     return nullptr;
 }
 
-
+//prikaz trenutnog stanja matrice u konzoli, ispis mozda nije previse lep, sluzi samo za debagovanje
 void ControlMatrix::showMatrix() {
 
     std::cout << "--------Control-Matrix--------" << std::endl << std::endl;

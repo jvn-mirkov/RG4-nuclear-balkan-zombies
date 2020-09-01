@@ -1,8 +1,6 @@
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <map>
-
+#include <list>
 
 // opengl libs
 #include <GL/glut.h>
@@ -14,13 +12,16 @@
 #include "Map.h"
 #include "Box.h"
 #include "ControlMatrix.h"
+#include "Bomb.h"
 
 
 //definovi:
 #define TIMER_ID_P1 (0)
 #define TIMER_ID_P2 (6)
 #define TIMER_ID_B1 (11)
+#define TIMER_ID_B2 (12)
 #define TIMER_INTERVAL (10)
+#define TIMER_INTERVAL2 (13)
 #define DEFAULT (5)
 #define UP (1)
 #define DOWN (2)
@@ -29,16 +30,14 @@
 
 
 //global variables
-float p1updown, p1leftright = 0;
-float p2updown, p2leftright = 0;
-int arrow = DEFAULT;
-
+int arrow1 = DEFAULT;
+int arrow2 = DEFAULT;
 
 //clipping planes
-double clip_plane0[] = {1,0,0,0};
-double clip_plane1[] = {0,0,1,0};
-double clip_plane2[] = {-1,0,0,15};
-double clip_plane3[] = {0,0,-1,13.001};
+double clip_plane0[] = {1, 0, 0, 0};
+double clip_plane1[] = {0, 0, 1, 0};
+double clip_plane2[] = {-1, 0, 0, 15};
+double clip_plane3[] = {0, 0, -1, 13.001};
 
 
 // function declarations
@@ -50,12 +49,20 @@ static void on_display(void);
 
 static void ontimer(int value);
 
+void idle(){    glutPostRedisplay();}
+
 
 // global objects
 Player *player1 = new Player(1.5, 1.5, '1');
+Player *player2 = new Player(11.5, 13.5, '2');
 Map *map = new Map();
 std::map<std::string, Box *> boxes;
 ControlMatrix *cm = new ControlMatrix();
+//std::list<Bomb> bombList = {};
+Bomb *currentBomb1 = nullptr;
+Bomb *currentBomb2 = nullptr;
+
+//int globalint = 0;
 
 void showBoxesMap() {
 
@@ -65,7 +72,17 @@ void showBoxesMap() {
 
 }
 
+void showBombsMap() {
 
+
+    if (currentBomb1 != nullptr)
+        std::cout << "######" << std::endl;
+    std::cout << currentBomb1->getX() << "/" << currentBomb1->getY() << "/" << currentBomb1->getTime() << std::endl;
+    std::cout << "######" << std::endl;
+
+}
+
+/*
 void initBoxes() {
 
 
@@ -93,6 +110,20 @@ void initBoxes() {
 
     }
 }
+*/
+void setLighting() {
+    //odredjujemo vektore
+    GLfloat position[] = {10, 10, 10, 1};
+    GLfloat ambient[] = {0.4, 0.4, 0.4, 1};
+    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1};
+    GLfloat specular[] = {1, 1, 1, 1};
+
+    //inicijalizujemo osobine osvetljenja
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+}
 
 
 int main(int argc, char **argv) {
@@ -115,10 +146,13 @@ int main(int argc, char **argv) {
     glClearColor(0.1, 0.1, 0.1, 0);
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.25);
+    glutIdleFunc(idle);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
+    //setLighting();
 
-
-    initBoxes();
-    showBoxesMap();
+    //initBoxes();
+    //showBoxesMap();
 
 
     glutMainLoop();
@@ -131,40 +165,43 @@ static void on_keyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 27:
             exit(EXIT_SUCCESS);
-            break;
 
 
 
         case 'm':
         case 'M':
             cm->showMatrix();
+            break;
 
+        case 'x':
+        case 'X':
+            showBombsMap();
+            break;
 
         case 's':
         case 'S':
-        case GLUT_KEY_UP:
-            arrow = DOWN;
+            arrow1 = DOWN;
             glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P1);
 
             break;
 
         case 'w':
         case 'W':
-            arrow = UP;
+            arrow1 = UP;
             glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P1);
 
             break;
 
         case 'a':
         case 'A':
-            arrow = LEFT;
+            arrow1 = LEFT;
             glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P1);
 
             break;
 
         case 'd':
         case 'D':
-            arrow = RIGHT;
+            arrow1 = RIGHT;
             glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P1);
 
             break;
@@ -176,36 +213,40 @@ static void on_keyboard(unsigned char key, int x, int y) {
             break;
 
 
-
-
-
-
-
         case 'i':
         case 'I':
-            arrow = UP;
-            glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P2);
+            arrow2 = UP;
+            glutTimerFunc(TIMER_INTERVAL2, ontimer, TIMER_ID_P2);
             break;
 
         case 'k':
         case 'K':
-            arrow = DOWN;
-            glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P2);
+            arrow2 = DOWN;
+            glutTimerFunc(TIMER_INTERVAL2, ontimer, TIMER_ID_P2);
             break;
 
         case 'j':
         case 'J':
-            arrow = LEFT;
-            glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P2);
+            arrow2 = LEFT;
+            glutTimerFunc(TIMER_INTERVAL2, ontimer, TIMER_ID_P2);
             break;
 
         case 'l':
         case 'L':
-            arrow = RIGHT;
-            glutTimerFunc(TIMER_INTERVAL, ontimer, TIMER_ID_P2);
+            arrow2 = RIGHT;
+            glutTimerFunc(TIMER_INTERVAL2, ontimer, TIMER_ID_P2);
             break;
 
+
+        case 'u':
+        case 'U':
+            glutTimerFunc(TIMER_INTERVAL2, ontimer, TIMER_ID_B2);
+
+            break;
+
+
     }
+    glutPostRedisplay();
 }
 
 static void ontimer(int value) {
@@ -213,16 +254,16 @@ static void ontimer(int value) {
 
     if (value == TIMER_ID_P1) {
 
-        if (arrow == RIGHT) {
+        if (arrow1 == RIGHT) {
             player1->moveVertical(cm, player1->getStep());
 
-        } else if (arrow == UP) {
+        } else if (arrow1 == UP) {
             player1->moveHorizontal(cm, -player1->getStep());
 
-        } else if (arrow == LEFT) {
+        } else if (arrow1 == LEFT) {
             player1->moveVertical(cm, -player1->getStep());
 
-        } else if (arrow == DOWN) {
+        } else if (arrow1 == DOWN) {
             player1->moveHorizontal(cm, player1->getStep());
 
         }
@@ -231,28 +272,37 @@ static void ontimer(int value) {
 
     if (value == TIMER_ID_P2) {
 
-        if (arrow == DOWN) {
-            p2updown = p2updown + 0.5;
+        if (arrow2 == RIGHT) {
+            player2->moveVertical(cm, player2->getStep());
 
-        } else if (arrow == LEFT) {
-            p2leftright = p2leftright - 0.5;
+        } else if (arrow2 == UP) {
+            player2->moveHorizontal(cm, -player2->getStep());
 
-        } else if (arrow == UP) {
-            p2updown = p2updown - 0.5;
+        } else if (arrow2 == LEFT) {
+            player2->moveVertical(cm, -player2->getStep());
 
-        } else if (arrow == RIGHT) {
-            p2leftright = p2leftright + 0.5;
+        } else if (arrow2 == DOWN) {
+            player2->moveHorizontal(cm, player2->getStep());
 
         }
 
     }
 
-    if(value == TIMER_ID_B1){
+    if (value == TIMER_ID_B1) {
 
         player1->dropBomb(cm);
-        std::cout<<"player1 - drop bomb" <<std::endl;
+        currentBomb1 = new Bomb(player1->getX(), player1->getY()); //inlineuj dole
+        //bombList.push_back(*b);
+        std::cout << "player1 - drop bomb" << std::endl;
     }
 
+    if (value == TIMER_ID_B2) {
+
+        player2->dropBomb(cm);
+        currentBomb2 = new Bomb(player2->getX(), player2->getY()); //inlineuj dole
+        //bombList.push_back(*b);
+        std::cout << "player2 - drop bomb" << std::endl;
+    }
     glutPostRedisplay();
 
 
@@ -273,24 +323,85 @@ static void on_display(void) {
     );
 
 
-
-
-    glClipPlane(GL_CLIP_PLANE0,clip_plane0);
-    glClipPlane(GL_CLIP_PLANE1,clip_plane1);
-    glClipPlane(GL_CLIP_PLANE2,clip_plane2);
-    glClipPlane(GL_CLIP_PLANE3,clip_plane3);
+    glClipPlane(GL_CLIP_PLANE0, clip_plane0);
+    glClipPlane(GL_CLIP_PLANE1, clip_plane1);
+    glClipPlane(GL_CLIP_PLANE2, clip_plane2);
+    glClipPlane(GL_CLIP_PLANE3, clip_plane3);
 
     glEnable(GL_CLIP_PLANE0);
     glEnable(GL_CLIP_PLANE1);
     glEnable(GL_CLIP_PLANE2);
     glEnable(GL_CLIP_PLANE3);
 
+    //globalint++;
+    //std::cout << globalint<< std::endl;
 
 
     map->renderMap();
     map->renderBoxes(cm);
     player1->renderPlayer();
+    player2->renderPlayer();
+
+
+
+    //provera da li je proslo dovoljno vremena za svaki deo animacije iscrtavanja unistavanja bombe
+    // FIXME: izdvajanje oba uslova za obe bombe u funkciju ili u kolekcijsku petlju dovodi do nezeljenih efekata
+    if (currentBomb1 != nullptr) {
+
+        currentBomb1->Tick();
+
+        if (200 > currentBomb1->getTime()) {
+            std::cout << "40" << std::endl;
+            map->renderBombAnimationPart1(currentBomb1->getX(), currentBomb1->getY());
+
+        }
+
+
+        if (100 > currentBomb1->getTime()) {
+            std::cout << "20" << std::endl;
+            map->renderBombAnimationPart2(currentBomb1->getX(), currentBomb1->getY());
+        }
+
+        if (0 == currentBomb1->getTime()) {
+            std::cout << "detonate" << std::endl;
+            currentBomb1->destroyBomb(cm, currentBomb1->getX(), currentBomb1->getY());
+            //bombList.pop_front(); //proveri zasto nece erase
+            player1->checkDeath(cm, currentBomb1->getX(), currentBomb1->getY());
+            player2->checkDeath(cm, currentBomb1->getX(), currentBomb1->getY());
+            currentBomb1 = nullptr;
+        }
+
+    }
+
+    if (currentBomb2 != nullptr) {
+
+        currentBomb2->Tick();
+
+        if (200 > currentBomb2->getTime()) {
+            std::cout << "40" << std::endl;
+            map->renderBombAnimationPart1(currentBomb2->getX(), currentBomb2->getY());
+
+        }
+
+
+        if (100 > currentBomb2->getTime()) {
+            std::cout << "20" << std::endl;
+            map->renderBombAnimationPart2(currentBomb2->getX(), currentBomb2->getY());
+        }
+
+        if (0 == currentBomb2->getTime()) {
+            std::cout << "detonate" << std::endl;
+            currentBomb2->destroyBomb(cm, currentBomb2->getX(), currentBomb2->getY());
+            //bombList.pop_front(); //proveri zasto nece erase
+            player1->checkDeath(cm, currentBomb2->getX(), currentBomb2->getY());
+            player2->checkDeath(cm, currentBomb2->getX(), currentBomb2->getY());
+            currentBomb2 = nullptr;
+        }
+
+    }
+
     map->renderBombs(cm);
+
 
     glDisable(GL_CLIP_PLANE3);
     glDisable(GL_CLIP_PLANE2);
@@ -300,51 +411,14 @@ static void on_display(void) {
 
 
 
-/*
-    glPushMatrix();
 
-    glColor3f(0, 0, 0);
-    glTranslatef(p2updown + 1.5, 1 - 0.5, p2leftright + 1.5);
-
-    glScalef(1, 1, 1);
-    glutSolidSphere(0.4, 10, 10);
-
-    glPopMatrix();
-
-
-
-
-    glPushMatrix();
-
-    glColor3f(0, 0, 0);
-    glTranslatef(p1leftright + 3, 1 - 0.50, p1updown + 3);
-
-    glScalef(1, 1, 1);
-    glutSolidSphere(0.4, 10, 10);
-
-    glPopMatrix();
-
-*/
-
-
-    glBegin(GL_LINES);
-
-    glColor3f(0, 0, 1);
-    glVertex3f(0, 0, 0);
-    glVertex3f(50, 0, 0);
-
-    glColor3f(0, 1, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 50, 0);
-
-    glColor3f(1, 0, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, 50);
-
-    glEnd();
 
 
     glutSwapBuffers();
+
+
+    glutPostRedisplay();
+    glFlush();
 
 }
 

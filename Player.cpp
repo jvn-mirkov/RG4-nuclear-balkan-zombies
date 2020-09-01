@@ -29,9 +29,8 @@ void Player::renderPlayer() {
     glPopMatrix();
 
 
-    //this->setX(dHorizontal + xStart);
-    //this->setY(dVertical + yStart);
-    std::cout << "Player:" << this->x << "/" << this->y << std::endl;
+
+    //std::cout << "Player:" << this->x << "/" << this->y << std::endl;
 
 
 }
@@ -46,9 +45,9 @@ void Player::moveVertical(ControlMatrix *cm, float step) {
     int futureY = static_cast<int>(trunc((this->y+step+stepSign*0.3) ));
 
 
-    if('0' == cm->mx[X][futureY] || this->playerNum == cm->mx[X][futureY]){
+    if( 'Q' == cm->mx[X][futureY] || '0' == cm->mx[X][futureY] || this->playerNum == cm->mx[X][futureY]){
 
-        if(oldY != futureY) {
+        if(oldY != futureY && 'Q' != cm->mx[X][futureY]) {
             cm->mx[X][oldY] = '0';
             cm->mx[X][futureY] = this->playerNum;
         }
@@ -69,9 +68,9 @@ void Player::moveHorizontal(ControlMatrix *cm, float step) {
 
 
 
-    if('0' == cm->mx[futureX][Y] || this->playerNum == cm->mx[futureX][Y]){
+    if('Q' == cm->mx[futureX][Y] || '0' == cm->mx[futureX][Y] || this->playerNum == cm->mx[futureX][Y]){
 
-        if(oldX != futureX) {
+        if(oldX != futureX && 'Q' == cm->mx[futureX][Y]) {
             cm->mx[oldX][Y] = '0';
             cm->mx[futureX][Y] = this->playerNum;
         }
@@ -84,7 +83,7 @@ void Player::moveHorizontal(ControlMatrix *cm, float step) {
 
 }
 
-
+//updateuje kontrolnu matricu informacijom gde je bomba postavljena, postavlja se na trenutne koordinate playera(mapirano na odredjenu poziciju u matrici)
 void Player::dropBomb(ControlMatrix *cm) {
 
 
@@ -95,182 +94,71 @@ void Player::dropBomb(ControlMatrix *cm) {
     std::cout << "Drop on" << bombX << "/" << bombY << std::endl;
 
     if ('Z' != cm->mx[bombX][bombY] && 'B' != cm->mx[bombX][bombY])
-        cm->mx[bombX][bombY] = 'Q';
+        cm->mx[bombX][bombY] = 'Q'; //problem jer ga player uvek pregazi/ mora paralelna mapa...
 
 
-    destroyBomb(cm, bombX, bombY);
-    //std::thread bombThread(&Player::destroyBomb, cm, bombX,bombY);
-    //bombThread.join();
+
+
+
+}
+
+//provera da li je u toku eksplozije player bio u njenom opsegu, ako jeste, izgubio je
+void Player::checkDeath(ControlMatrix *cm, float bombX, float bombY){
+
+    int bombXt = static_cast<int>(trunc(bombX ));
+    int bombYt = static_cast<int>(trunc(bombY ));
+
+    if (cm->mx[bombXt][bombYt] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt - 1][bombYt] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt - 2][bombYt] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt + 1][bombYt] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt + 2][bombYt] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt][bombYt - 1] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt][bombYt - 2] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt][bombYt + 1] == playerNum) { showDeathScreen(); }
+    else if (cm->mx[bombXt][bombYt + 2] == playerNum) { showDeathScreen(); }
+
+
+
 
 }
 
 
-void Player::explosionAnimation(int bombX, int bombY) {
+void Player::showDeathScreen(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(0, 0, 1);
 
-    sleep(2000);
-
-//TODO: smanji kod tako sto ce se iterirati kroz niz vektora kao parametri za glTranslate
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(1, 0, 0);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(
+            5, 15, 15,
+            5, 0, 5,
+            0, 15, 0
+    );
 
 
-    glPushMatrix();
+    std::cout << "uslo";
+    std::string c(1,this->playerNum);
 
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(-1, 0, 0);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
+    std::string msg = "Pobedio je igrac " + c + ", pritisni ESC ";
 
-    glPopMatrix();
-
-
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(0, 0, 1);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
+    glColor3f(1, 1, 1); // ???nece??
+    glRasterPos3f(3, 5, 3);
+    for (int i=0; i < msg.length()-1; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, msg[i]);
 
 
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(0, 0, -1);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
 
 
-    std::cout << "Nacrtano prvo" << std::endl;
-
-    sleep(1000);
-    std::cout << "prvo sleep" << std::endl;
-
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(2, 0, 0);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
 
 
-    glPushMatrix();
 
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(-2, 0, 0);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
+    glutSwapBuffers();
 
-    glPopMatrix();
-
-
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(0, 0, 2);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
-
-
-    glPushMatrix();
-
-    glColor3f(0.6, 0.4, 0.76);
-    glTranslatef(0, 0, -2);
-    glRotatef(45, 0.0, 0.0, 1.0);
-    glScalef(0.45, 0.45, 0.45);
-    glutSolidCube(1);
-
-    glPopMatrix();
-
-
-    std::cout << "Nacrtano drugo" << std::endl;
-
-
-    sleep(1000);
-    std::cout << "drugo sleep" << std::endl;
-}
-
-
-void Player::destroyBomb(ControlMatrix *cm, int bombX, int bombY) {
-
-    //this->explosionAnimation(bombX, bombY);
-
-
-    cm->mx[bombX][bombY] = '0';
-
-
-    if (bombX == 1) {
-        if (cm->mx[bombX - 1][bombY] == 'B') { cm->mx[bombX - 1][bombY] = '0'; }
-        //if (cm->mx[bombX - 2][bombY] == 'B') { cm->mx[bombX - 2][bombY] = '0'; }
-        if (cm->mx[bombX + 1][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX + 2][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX][bombY - 1] == 'B') { cm->mx[bombX][bombY - 1] = '0'; }
-        if (cm->mx[bombX][bombY - 2] == 'B') { cm->mx[bombX][bombY - 2] = '0'; }
-        if (cm->mx[bombX][bombY + 1] == 'B') { cm->mx[bombX][bombY + 1] = '0'; }
-        if (cm->mx[bombX][bombY + 2] == 'B') { cm->mx[bombX][bombY + 2] = '0'; }
-    }
-    if (bombY == 1) {
-        if (cm->mx[bombX - 1][bombY] == 'B') { cm->mx[bombX - 1][bombY] = '0'; }
-        if (cm->mx[bombX - 2][bombY] == 'B') { cm->mx[bombX - 2][bombY] = '0'; }
-        if (cm->mx[bombX + 1][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX + 2][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX][bombY - 1] == 'B') { cm->mx[bombX][bombY - 1] = '0'; }
-        //if (cm->mx[bombX][bombY - 2] == 'B') { cm->mx[bombX][bombY - 2] = '0'; }
-        if (cm->mx[bombX][bombY + 1] == 'B') { cm->mx[bombX][bombY + 1] = '0'; }
-        if (cm->mx[bombX][bombY + 2] == 'B') { cm->mx[bombX][bombY + 2] = '0'; }
-    }
-    if (bombX == 13) {
-        if (cm->mx[bombX - 1][bombY] == 'B') { cm->mx[bombX - 1][bombY] = '0'; }
-        if (cm->mx[bombX - 2][bombY] == 'B') { cm->mx[bombX - 2][bombY] = '0'; }
-        if (cm->mx[bombX + 1][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        //if (cm->mx[bombX + 2][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX][bombY - 1] == 'B') { cm->mx[bombX][bombY - 1] = '0'; }
-        if (cm->mx[bombX][bombY - 2] == 'B') { cm->mx[bombX][bombY - 2] = '0'; }
-        if (cm->mx[bombX][bombY + 1] == 'B') { cm->mx[bombX][bombY + 1] = '0'; }
-        if (cm->mx[bombX][bombY + 2] == 'B') { cm->mx[bombX][bombY + 2] = '0'; }
-    }
-    if (bombY == 11) {
-        if (cm->mx[bombX - 1][bombY] == 'B') { cm->mx[bombX - 1][bombY] = '0'; }
-        if (cm->mx[bombX - 2][bombY] == 'B') { cm->mx[bombX - 2][bombY] = '0'; }
-        if (cm->mx[bombX + 1][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX + 2][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX][bombY - 1] == 'B') { cm->mx[bombX][bombY - 1] = '0'; }
-        if (cm->mx[bombX][bombY - 2] == 'B') { cm->mx[bombX][bombY - 2] = '0'; }
-        if (cm->mx[bombX][bombY + 1] == 'B') { cm->mx[bombX][bombY + 1] = '0'; }
-        //if (cm->mx[bombX][bombY + 2] == 'B') { cm->mx[bombX][bombY + 2] = '0'; }
-    } else {
-        if (cm->mx[bombX - 1][bombY] == 'B') { cm->mx[bombX - 1][bombY] = '0'; }
-        if (cm->mx[bombX - 2][bombY] == 'B') { cm->mx[bombX - 2][bombY] = '0'; }
-        if (cm->mx[bombX + 1][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX + 2][bombY] == 'B') { cm->mx[bombX + 2][bombY] = '0'; }
-        if (cm->mx[bombX][bombY - 1] == 'B') { cm->mx[bombX][bombY - 1] = '0'; }
-        if (cm->mx[bombX][bombY - 2] == 'B') { cm->mx[bombX][bombY - 2] = '0'; }
-        if (cm->mx[bombX][bombY + 1] == 'B') { cm->mx[bombX][bombY + 1] = '0'; }
-        if (cm->mx[bombX][bombY + 2] == 'B') { cm->mx[bombX][bombY + 2] = '0'; }
-    }
-
+    getchar();
 
 }
+
 
 
 void Player::setX(float x) {
@@ -285,5 +173,11 @@ float Player::getStep() const {
     return step;
 }
 
+float Player::getX() const {
+    return x;
+}
 
+float Player::getY() const {
+    return y;
+}
 

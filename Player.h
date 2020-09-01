@@ -20,12 +20,22 @@ public:
     float getStep() const;
 
     void moveVertical(ControlMatrix *cm, float step);
+
     void moveHorizontal(ControlMatrix *cm, float step);
+
     void dropBomb(ControlMatrix *cm);
 
+    void checkDeath(ControlMatrix *cm, float bombX, float bombY);
+
+    void showDeathScreen();
 
     void explosionAnimation(int bombX, int bombY);
+
     void destroyBomb(ControlMatrix *cm, int bombX, int bombY);
+
+    float getX() const;
+
+    float getY() const;
 
 
 private:
