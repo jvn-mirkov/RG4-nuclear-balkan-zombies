@@ -18,4 +18,5 @@ Pozicionirati se u koren direktorijuma i nakon komande `make` pokrenuti dobijeni
 
 ## Poznati problemi
 Kretanje nije glatko
+
 Igra i ako je predviđena za dva igrača ne prima paralelno inpute za kretanje tako da se istovremeno kretanje dva igrača može dobiti repetativnim kliktanjem tastera za kretanje
