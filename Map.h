@@ -8,7 +8,7 @@ class Map {
 public:
     Map();
 
-    void renderMap();
+    void renderMap(unsigned int pozadina);
 
     void renderBoxes(ControlMatrix *cm);
 
@@ -17,6 +17,8 @@ public:
     void renderBombAnimationPart1(float x, float y);
 
     void renderBombAnimationPart2(float x, float y);
+
+
 
 private:
 

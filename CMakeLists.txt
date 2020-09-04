@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 
-add_executable(nbz  main.cpp Player.cpp Player.h Map.cpp Map.h Box.cpp Box.h ControlMatrix.cpp ControlMatrix.h)
+add_executable(nbz  main.cpp Player.cpp Player.h Map.cpp Map.h Box.cpp Box.h ControlMatrix.cpp ControlMatrix.h Bomb.cpp Bomb.h)
 target_link_libraries(nbz -lOpenGL32 -lfreeGLUT -lglu32 )

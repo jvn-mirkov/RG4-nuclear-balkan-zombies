@@ -25,7 +25,7 @@ public:
 
     void dropBomb(ControlMatrix *cm);
 
-    void checkDeath(ControlMatrix *cm, float bombX, float bombY);
+    bool checkDeath(ControlMatrix *cm, float bombX, float bombY);
 
     void showDeathScreen();
 
