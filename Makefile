@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++17 -g -Wall -Wextra
 LDLIBS = -lglut -lGLU -lGL -lm
 
 $(PROGRAM) : ControlMatrix.o Map.o Box.o Player.o Bomb.o main.o
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS) && ./nbz
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS) 
 
 ControlMatrix.o: ControlMatrix.cpp ControlMatrix.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDLIBS)
