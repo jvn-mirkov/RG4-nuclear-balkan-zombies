@@ -6,6 +6,10 @@ Neophodne biblioteke preuzeti preko `sudo apt-get install binutils-gold freeglut
 
 Pozicionirati se u koren direktorijuma i nakon komande `make` pokrenuti dobijeni izvršivi fajl.
 
+U slučaju problema uraditi isto sa `cmake`.
+
+U slučaju daljih problema pokrenuti sa `g++ -std=c++14 main.cpp Player.cpp ControlMatrix.cpp Bomb.cpp Box.cpp Map.cpp  -lGL -lglut -lm -lGLU`.
+
 ## Kontrole
 
 ### Igrač 1
