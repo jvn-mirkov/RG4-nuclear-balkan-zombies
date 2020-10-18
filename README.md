@@ -20,7 +20,3 @@ U slučaju daljih problema pokrenuti sa `g++ -std=c++14 main.cpp Player.cpp Cont
 >* IKJL - kretanje 
 >* U - postavljanje bombe
 
-## Poznati problemi
-Kretanje nije glatko
-
-Igra i ako je predviđena za dva igrača ne prima paralelno inpute za kretanje tako da se istovremeno kretanje dva igrača može dobiti repetativnim kliktanjem tastera za kretanje
